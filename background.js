@@ -50,7 +50,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // Create an alarm that fires every 1 minute
-chrome.alarms.create('fetchDataAlarm', { periodInMinutes: 1 });
+chrome.alarms.create('fetchDataAlarm', { periodInMinutes: 10 });
 
 // Set up an alarm listener
 chrome.alarms.onAlarm.addListener((alarm) => {
