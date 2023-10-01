@@ -16,7 +16,7 @@ body, html {
     font-size: 20px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     width: 100%; /* Ensure it takes up the full width */
-    font-family: 'Roboto Regular', sans-serif;
+    font-family: 'Arcon Regular', sans-serif;
   }
   
   #match-list {
@@ -78,6 +78,12 @@ body, html {
   @font-face {
     font-family: 'Roboto Regular';
     src: url('./Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Arcon Regular';
+    src: url('./Arcon-Regular.otf') format('truetype');
     font-weight: normal;
     font-style: normal;
   }
