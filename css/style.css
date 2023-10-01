@@ -1,0 +1,86 @@
+/* Reset default margins and padding */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 300px;
+    height: 500px;
+    overflow: hidden; /* Prevent scroll on the body */
+  }
+  
+  /* Add styles for the header */
+  #header {
+    background-color: #1f272f;
+    color: white;
+    text-align: center;
+    padding: 1px;
+    font-size: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%; /* Ensure it takes up the full width */
+    font-family: 'Roboto Regular', sans-serif;
+  }
+  
+  #match-list {
+    max-height: 500px; /* Adjust based on your needs */
+    overflow-y: auto; /* Make it scrollable */
+    padding-bottom: 20px;
+  }
+  
+  /* Custom scrollbar styles */
+  #match-list .simplebar-scrollbar::before {
+    background-color: #007BFF; /* Change the scrollbar color as needed */
+  }
+  .team {
+    display: flex;
+    align-items: center;
+  }
+  
+  .team-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 7px;
+  }
+  
+  .team-name {
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Roboto Regular', sans-serif;
+  }
+  
+  .match-time {
+    font-size: 14px;
+    text-align: right;
+    margin-top: 35px;
+    white-space: nowrap;
+  }
+  .event-name {
+    font-size: 12px;  /* Set the font size */
+    color: #888;     /* Optional: Set the text color */
+    margin-bottom: 5px;  /* Optional: Add some margin for spacing */
+  }
+
+  .list-group-item:hover {
+    background-color: #343a40;  /* Darken the background on hover */
+    cursor: pointer;  /* Change the cursor to a hand */
+  }
+  
+  .list-group-item:hover .team-name, 
+  .list-group-item:hover .event-name,
+  .list-group-item:hover .match-time {
+    color: white;  /* Change the text color on hover */
+  }
+  
+  @font-face {
+    font-family: 'Roboto Thin';
+    src: url('./Roboto-Thin.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Roboto Regular';
+    src: url('./Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+    
+    
+  
