@@ -1,10 +1,9 @@
-/* Reset default margins and padding */
 body, html {
     margin: 0;
     padding: 0;
     width: 300px;
     height: 500px;
-    overflow: hidden; /* Prevent scroll on the body */
+    overflow: hidden; 
   }
   
   /* Add styles for the header */
@@ -15,19 +14,19 @@ body, html {
     padding: 1px;
     font-size: 20px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%; /* Ensure it takes up the full width */
+    width: 100%;
     font-family: 'Arcon Regular', sans-serif;
   }
   
   #match-list {
-    max-height: 500px; /* Adjust based on your needs */
-    overflow-y: auto; /* Make it scrollable */
+    max-height: 500px;
+    overflow-y: auto; 
     padding-bottom: 20px;
   }
   
   /* Custom scrollbar styles */
   #match-list .simplebar-scrollbar::before {
-    background-color: #007BFF; /* Change the scrollbar color as needed */
+    background-color: #007BFF; 
   }
   .team {
     display: flex;
@@ -53,20 +52,23 @@ body, html {
     white-space: nowrap;
   }
   .event-name {
-    font-size: 12px;  /* Set the font size */
-    color: #888;     /* Optional: Set the text color */
-    margin-bottom: 5px;  /* Optional: Add some margin for spacing */
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .list-group-item:hover {
-    background-color: #343a40;  /* Darken the background on hover */
-    cursor: pointer;  /* Change the cursor to a hand */
+    background-color: #343a40;
+    cursor: pointer;
   }
   
   .list-group-item:hover .team-name, 
   .list-group-item:hover .event-name,
   .list-group-item:hover .match-time {
-    color: white;  /* Change the text color on hover */
+    color: white;
   }
   
   @font-face {
