@@ -2,7 +2,6 @@ body, html {
     margin: 0;
     padding: 0;
     width: 300px;
-    height: 500px;
     overflow: hidden; 
   }
   
@@ -19,9 +18,7 @@ body, html {
   }
   
   #match-list {
-    max-height: 500px;
     overflow-y: auto; 
-    padding-bottom: 20px;
   }
   
   /* Custom scrollbar styles */
@@ -64,6 +61,7 @@ body, html {
     background-color: #343a40;
     cursor: pointer;
   }
+  
   
   .list-group-item:hover .team-name, 
   .list-group-item:hover .event-name,
