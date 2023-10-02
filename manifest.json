@@ -4,6 +4,9 @@
     "version": "1.0",
     "description": "Displays matches of the day from HLTV",
     "permissions": ["storage", "alarms"],
+    "host_permissions": [
+      "https://azi.blob.core.windows.net/hltv/matches.json"
+    ],
     "background": {
       "service_worker": "background.js"
     },
