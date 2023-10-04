@@ -42,21 +42,27 @@ body, html {
     font-family: 'Roboto Regular', sans-serif;
   }
   
-  .match-time {
-    font-size: 14px;
-    text-align: right;
-    margin-top: 35px;
-    white-space: nowrap;
+  .d-flex.w-100.justify-content-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
+  
   .event-name {
     font-size: 12px;
     color: #888;
-    margin-bottom: 5px; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 5px;
+    /* Remove white-space and text-overflow rules */
+    flex-grow: 0;
+    flex-shrink: 1;
   }
-
+  
+  .match-time {
+    font-size: 14px;
+    white-space: nowrap; /* This can stay the same */
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
   .list-group-item:hover {
     background-color: #343a40;
     cursor: pointer;
