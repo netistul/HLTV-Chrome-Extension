@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "HLTV Matches",
-    "version": "1.03",
+    "version": "1.05",
     "description": "Displays matches of the day from HLTV",
     "permissions": ["storage", "alarms"],
     "host_permissions": [

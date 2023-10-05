@@ -2,7 +2,7 @@
 function fetchDataAndStore() {
   console.log('Attempting to fetch data...');  // Debugging line
   
-  fetch('https://azi.blob.core.windows.net/hltv/matches.json')
+  fetch(`https://azi.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');  // New error handling
@@ -54,14 +54,21 @@ self.addEventListener('activate', (event) => {
 });
 
 // Create an alarm that fires every 10 minute
-chrome.alarms.create('fetchDataAlarm', { periodInMinutes: 10 });
+chrome.alarms.get('fetchDataAlarm', (alarm) => {
+  if (!alarm) {
+    chrome.alarms.create('fetchDataAlarm', { periodInMinutes: 10 });
+  }
+});
+
 
 // Set up an alarm listener
 chrome.alarms.onAlarm.addListener((alarm) => {
+  console.log('Alarm fired:', alarm.name);
   if (alarm.name === 'fetchDataAlarm') {
     fetchDataAndStore();
   }
 });
+
 
 // Add this line to fetch data when Chrome starts up
 chrome.runtime.onStartup.addListener(() => {
