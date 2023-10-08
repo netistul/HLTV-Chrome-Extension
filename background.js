@@ -18,8 +18,12 @@ function fetchDataAndStore() {
         const liveMatchesCount = data.filter(match => match.date === "Date not specified").length;
         
         // Update the badge
-        chrome.action.setBadgeText({text: liveMatchesCount.toString()});
-        chrome.action.setBadgeBackgroundColor({color: '#2b6ea4'});
+        if (liveMatchesCount > 0) {
+          chrome.action.setBadgeText({text: liveMatchesCount.toString()});
+          chrome.action.setBadgeBackgroundColor({color: '#2b6ea4'});
+        } else {
+          chrome.action.setBadgeText({text: ''}); // Clear badge when liveMatchesCount is 0
+        }
         
         // Send a message to popup.js to let it know that new data is available
         chrome.runtime.sendMessage({message: 'data_updated'}, function(response) {
