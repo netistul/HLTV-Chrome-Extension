@@ -1,4 +1,4 @@
-# HLTV-Matches-Chrome-Extension
+# HLTV-Chrome-Extension
 Chrome extension that displays the day's matches in a sleek popup. Seamlessly integrated with a Node.js backend from the HLTV-Match-Fetcher repository for real-time, up-to-date data. 🦉
 ## Backend
 The backend for this project is hosted in a separate repository: [HLTV-Match-Fetcher](https://github.com/netistul/HLTV-Match-Fetcher). The backend script fetches and formats match data, saving it to a JSON file. This JSON file is then used by the frontend to display match information.
