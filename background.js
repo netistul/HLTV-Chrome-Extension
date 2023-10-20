@@ -1,16 +1,16 @@
 // background.js
 function fetchDataAndStore() {
-  console.log('Attempting to fetch data...');  // Debugging line
+  console.log('Attempting to fetch data...');
   
   fetch(`https://azi.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');  // New error handling
+        throw new Error('Network response was not ok');
       }
       return response.json();
     })
     .then(data => {
-      console.log('Data fetched:', data);  // Debugging line
+      console.log('Data fetched:', data);
       chrome.storage.local.set({ matchesData: data }, () => {
         console.log('Data fetched and stored.');
         
@@ -70,7 +70,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 
-// Add this line to fetch data when Chrome starts up
+// fetch data when Chrome starts up
 chrome.runtime.onStartup.addListener(() => {
   fetchDataAndStore();
 });
