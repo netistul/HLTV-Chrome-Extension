@@ -5,7 +5,7 @@
     "description": "Displays matches of the day from HLTV",
     "permissions": ["storage", "alarms"],
     "host_permissions": [
-      "https://bby.blob.core.windows.net/hltv/matches.json"
+      "https://example.blob.core.windows.net/hltv/matches.json"
     ],
     "background": {
       "service_worker": "background.js"

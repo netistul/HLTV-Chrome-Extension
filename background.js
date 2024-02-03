@@ -2,7 +2,7 @@
 function fetchDataAndStore() {
   console.log('Attempting to fetch data...');
   
-  fetch(`https://bby.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
+  fetch(`https://example.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
