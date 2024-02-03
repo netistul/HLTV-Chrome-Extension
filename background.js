@@ -2,7 +2,7 @@
 function fetchDataAndStore() {
   console.log('Attempting to fetch data...');
   
-  fetch(`https://azi.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
+  fetch(`https://bby.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -14,8 +14,19 @@ function fetchDataAndStore() {
       chrome.storage.local.set({ matchesData: data }, () => {
         console.log('Data fetched and stored.');
         
-        // Count the number of live matches
-        const liveMatchesCount = data.filter(match => match.date === "Date not specified").length;
+        // Get the current date and time
+        const now = new Date();
+        
+        // Filter live matches to count only those with a recordDate within the last hour
+        const liveMatchesCount = data.filter(match => {
+          if (match.date !== "Date not specified") {
+            return false; // Exclude matches with a specified date
+          } else {
+            const recordDate = new Date(match.recordDate);
+            const hoursDiff = (now - recordDate) / (3600000); // Convert milliseconds to hours
+            return hoursDiff <= 1; // Include if recordDate is less than or equal to 1 hour old
+          }
+        }).length;
         
         // Update the badge
         if (liveMatchesCount > 0) {

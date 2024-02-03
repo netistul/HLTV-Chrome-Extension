@@ -14,22 +14,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // Limiting the matches to the first 20 entries
       const limitedData = data.slice(0, 20);
-      const today = new Date();
-      const msPerDay = 24 * 60 * 60 * 1000;
+      const now = new Date(); // Use for both date comparison and recordDate comparison
 
-      const matchesWithin24Hrs = limitedData.filter(match => {
-        if (match.date === "Date not specified") return true; // Treat "Date not specified" as live matches
-        const matchDate = new Date(match.date);
-        const timeDifference = matchDate.getTime() - today.getTime();
-        return timeDifference >= 0 && timeDifference <= msPerDay;
+      const filteredMatches = limitedData.filter(match => {
+        if (match.date === "Date not specified") {
+          const recordDate = new Date(match.recordDate);
+          const hoursDiff = (now - recordDate) / (3600000); // Convert milliseconds to hours
+          return hoursDiff <= 1; // Only include if recordDate is less than or equal to 1 hour old
+        } else {
+          const matchDate = new Date(match.date);
+          return now <= matchDate && (matchDate - now) <= 86400000; // Match within the next 24 hours
+        }
       });
 
-      if (matchesWithin24Hrs.length === 0) {
-        matchList.innerHTML = "<p>No matches today.</p>";
+      if (filteredMatches.length === 0) {
+        matchList.innerHTML = "<p>No matches today or upcoming live matches within the last hour.</p>";
         return;
       }
 
-      matchList.innerHTML = matchesWithin24Hrs.map(match => {
+      matchList.innerHTML = filteredMatches.map(match => {
         const team1Logo = (match.team1Logo && match.team1Logo !== "Logo not available") ? match.team1Logo : 'https://www.hltv.org/img/static/team/placeholder.svg';
         const team2Logo = (match.team2Logo && match.team2Logo !== "Logo not available") ? match.team2Logo : 'https://www.hltv.org/img/static/team/placeholder.svg';
         const eventName = match.event ? match.event : "Unknown Event";
@@ -72,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function() {
       new SimpleBar(matchList, { autoHide: false });
     });
   }
-
 
   // Initial update
   updateData();

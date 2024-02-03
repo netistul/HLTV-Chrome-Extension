@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
     "name": "HLTV Matches",
-    "version": "1.05",
+    "version": "1.07",
     "description": "Displays matches of the day from HLTV",
     "permissions": ["storage", "alarms"],
     "host_permissions": [
-      "https://azi.blob.core.windows.net/hltv/matches.json"
+      "https://bby.blob.core.windows.net/hltv/matches.json"
     ],
     "background": {
       "service_worker": "background.js"
