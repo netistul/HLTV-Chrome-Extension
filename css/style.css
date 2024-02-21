@@ -49,17 +49,17 @@ body, html {
   }
   
   .event-name {
+    display: none; /* Hide the element by default, removing it from the layout */
     font-size: 12px;
     color: #888;
     margin-bottom: 5px;
-    /* Remove white-space and text-overflow rules */
     flex-grow: 0;
     flex-shrink: 1;
   }
   
   .match-time {
     font-size: 14px;
-    white-space: nowrap; /* This can stay the same */
+    white-space: nowrap;
     flex-grow: 0;
     flex-shrink: 0;
   }
@@ -68,9 +68,13 @@ body, html {
     cursor: pointer;
   }
   
-  
+  /* Show the event name on hover */
+  .list-group-item:hover .event-name {
+    display: block; /* Make the event name occupy space and become visible on hover */
+    color: white;
+  }
+
   .list-group-item:hover .team-name, 
-  .list-group-item:hover .event-name,
   .list-group-item:hover .match-time {
     color: white;
   }
