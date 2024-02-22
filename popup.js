@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
   const matchList = document.getElementById("match-list");
 
+  // Attempt to load cached HTML content first
+  const cachedHTML = localStorage.getItem('cachedMatchListHTML');
+  if (cachedHTML) {
+    matchList.innerHTML = cachedHTML;
+    // Re-initialize any JavaScript-based UI enhancements here, if necessary
+    new SimpleBar(matchList, { autoHide: false });
+  }
+
   // Function to update data
   function updateData() {
     // Retrieve data from Chrome's storage
@@ -71,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // Dynamically set the max-height
       matchList.style.maxHeight = `${maxHeight}px`;
 
-      // Initialize SimpleBar (retain the height setting)
+      // Re-initialize SimpleBar (retain the height setting)
       new SimpleBar(matchList, { autoHide: false });
     });
   }
