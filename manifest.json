@@ -1,22 +1,21 @@
 {
-    "manifest_version": 3,
-    "name": "HLTV Matches",
-    "version": "1.09",
-    "description": "Displays matches of the day from HLTV",
-    "permissions": ["storage", "alarms"],
-    "host_permissions": [
-      "https://example.blob.core.windows.net/hltv/matches.json"
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "icons": {
-      "16": "icon.png",
-      "48": "icon.png",
-      "128": "icon.png"
-    }
+  "manifest_version": 3,
+  "name": "HLTV Matches",
+  "version": "1.10",
+  "description": "Displays matches of the day from HLTV",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://example.blob.core.windows.net/hltv/matches.json"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   }
-  
+}
