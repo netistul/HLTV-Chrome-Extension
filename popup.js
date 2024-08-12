@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const matchList = document.getElementById("match-list");
 
   // Attempt to load cached HTML content first
@@ -9,10 +9,27 @@ document.addEventListener("DOMContentLoaded", function () {
     new SimpleBar(matchList, { autoHide: false });
   }
 
+  // Function to filter matches
+  const filterMatches = (data, now) => {
+    return data.filter((match) => {
+      if (match.date === "Date not specified") {
+        const recordDate = new Date(match.recordDate);
+        const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
+
+        // If the match has been recorded within the last 3 hours, it's considered live.
+        // This 3-hour window is used as a safeguard in case the API doesn't update the match status.
+        return hoursDiff <= 3;
+      } else {
+        const matchDate = new Date(match.date);
+        return now <= matchDate && matchDate - now <= 86400000; // Match within the next 24 hours
+      }
+    });
+  };
+
   // Function to update data
-  function updateData() {
+  const updateData = () => {
     // Retrieve data from Chrome's storage
-    chrome.storage.local.get("matchesData", function (result) {
+    chrome.storage.local.get("matchesData", (result) => {
       const data = result.matchesData;
 
       if (!data) {
@@ -24,16 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const limitedData = data.slice(0, 20);
       const now = new Date(); // Use for both date comparison and recordDate comparison
 
-      const filteredMatches = limitedData.filter((match) => {
-        if (match.date === "Date not specified") {
-          const recordDate = new Date(match.recordDate);
-          const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
-          return hoursDiff <= 5; // Only include if recordDate is less than or equal to 5 hours old
-        } else {
-          const matchDate = new Date(match.date);
-          return now <= matchDate && matchDate - now <= 86400000; // Match within the next 24 hours
-        }
-      });
+      const filteredMatches = filterMatches(limitedData, now);
 
       if (filteredMatches.length === 0) {
         matchList.innerHTML =
@@ -56,29 +64,29 @@ document.addEventListener("DOMContentLoaded", function () {
             match.date === "Date not specified"
               ? "Live"
               : new Date(match.date).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                hour: "2-digit",
+                minute: "2-digit",
+              });
           const matchLink = match.matchLink ? match.matchLink : "#";
 
           return `
-          <a href="${matchLink}" target="_blank" class="list-group-item list-group-item-dark">
-            <div class="d-flex w-100 justify-content-between">
-              <div>
-                <div class="event-name">${eventName}</div>
-                <div class="team">
-                  <img src="${team1Logo}" alt="${match.team1}" class="team-logo">
-                  <span class="team-name">${match.team1}</span>
+            <a href="${matchLink}" target="_blank" class="list-group-item list-group-item-dark">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <div class="event-name">${eventName}</div>
+                  <div class="team">
+                    <img src="${team1Logo}" alt="${match.team1}" class="team-logo">
+                    <span class="team-name">${match.team1}</span>
+                  </div>
+                  <div class="team">
+                    <img src="${team2Logo}" alt="${match.team2}" class="team-logo">
+                    <span class="team-name">${match.team2}</span>
+                  </div>
                 </div>
-                <div class="team">
-                  <img src="${team2Logo}" alt="${match.team2}" class="team-logo">
-                  <span class="team-name">${match.team2}</span>
-                </div>
+                <small class="match-time">${localTime}</small>
               </div>
-              <small class="match-time">${localTime}</small>
-            </div>
-          </a>
-        `;
+            </a>
+          `;
         })
         .join("");
 
@@ -97,20 +105,8 @@ document.addEventListener("DOMContentLoaded", function () {
       // Re-initialize SimpleBar (retain the height setting)
       new SimpleBar(matchList, { autoHide: false });
     });
-  }
+  };
 
   // Initial update
   updateData();
-
-  // Listen for messages from background.js
-  chrome.runtime.onMessage.addListener(function (
-    request,
-    sender,
-    sendResponse
-  ) {
-    if (request.message === "data_updated") {
-      // Fetch new data from chrome.storage.local
-      updateData();
-    }
-  });
 });

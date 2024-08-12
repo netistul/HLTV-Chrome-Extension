@@ -15,29 +15,16 @@ function fetchDataAndStore() {
       chrome.storage.local.set({ matchesData: data }, () => {
         console.log("Data fetched and stored.");
 
-        // Get the current date and time
-        const now = new Date();
-
-        // Filter live matches to count only those with a recordDate within the appropriate window
-        const liveMatches = data.filter((match) => {
+        // Calculate live matches count
+        const liveMatchesCount = data.filter((match) => {
           if (match.date === "Date not specified") {
+            const now = new Date();
             const recordDate = new Date(match.recordDate);
             const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
-            return hoursDiff <= 5; // Include if recordDate is less than or equal to 5 hours old
+            return hoursDiff <= 3; // Include if recordDate is less than or equal to 3 hours old
           }
           return false;
-        });
-
-        const upcomingMatches = data.filter((match) => {
-          if (match.date !== "Date not specified") {
-            const matchDate = new Date(match.date);
-            return now <= matchDate && matchDate - now <= 3600000; // Match within the next 1 hour
-          }
-          return false;
-        });
-
-        const liveMatchesCount = liveMatches.length;
-        const upcomingMatchesCount = upcomingMatches.length;
+        }).length;
 
         // Update the badge
         if (liveMatchesCount > 0) {
@@ -46,18 +33,6 @@ function fetchDataAndStore() {
         } else {
           chrome.action.setBadgeText({ text: "" }); // Clear badge when liveMatchesCount is 0
         }
-
-        // Send a message to popup.js to let it know that new data is available
-        chrome.runtime.sendMessage(
-          { message: "data_updated" },
-          function (response) {
-            if (chrome.runtime.lastError) {
-              console.warn(chrome.runtime.lastError.message);
-            } else {
-              // Handle the response or do other things.
-            }
-          }
-        );
       });
     })
     .catch((error) => {
@@ -77,7 +52,7 @@ self.addEventListener("activate", (event) => {
   fetchDataAndStore();
 });
 
-// Create an alarm that fires every 10 minute
+// Create an alarm that fires every 10 minutes
 chrome.alarms.get("fetchDataAlarm", (alarm) => {
   if (!alarm) {
     chrome.alarms.create("fetchDataAlarm", { periodInMinutes: 10 });
@@ -92,7 +67,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-// fetch data when Chrome starts up
+// Fetch data when Chrome starts up
 chrome.runtime.onStartup.addListener(() => {
   fetchDataAndStore();
 });
