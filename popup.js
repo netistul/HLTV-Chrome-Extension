@@ -17,11 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
 
         // If the match has been recorded within the last 3 hours, it's considered live.
-        // This 3-hour window is used as a safeguard in case the API doesn't update the match status.
         return hoursDiff <= 3;
       } else {
         const matchDate = new Date(match.date);
-        return now <= matchDate && matchDate - now <= 86400000; // Match within the next 24 hours
+
+        // Allow a 1-hour delay for matches that have started
+        const oneHourInMs = 3600000;
+
+        // Match should appear if it's within the next 24 hours or started in the last hour
+        return now <= (matchDate.getTime() + oneHourInMs) && matchDate - now <= 86400000;
       }
     });
   };
