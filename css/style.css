@@ -117,30 +117,51 @@ html {
 .d-flex.w-100.justify-content-between {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Change from center to allow vertical stacking */
 }
 
+/* First, let's fix the main container structure */
+.d-flex.w-100.justify-content-between {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping for our new structure */
+  justify-content: space-between;
+  align-items: center; /* Keep items vertically centered */
+  width: 100%;
+}
+
+/* Adjust the teams container to allow space for event-name */
+.d-flex.w-100.justify-content-between > div:first-child {
+  flex: 1; /* Take up available space but allow shrinking */
+  min-width: 0; /* Allow shrinking past content width */
+  margin-right: 10px;
+}
+
+/* Fix the event name positioning */
 .event-name {
-  display: none;
+  display: none; /* Hidden by default */
   font-size: 11px;
   color: #888;
-  margin-bottom: 5px;
-  flex-grow: 0;
-  flex-shrink: 1;
-  transition: color 0.2s ease;
+  margin-left: auto; /* Push to the right */
+  margin-right: 10px; /* Space before match time */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  order: 1; /* Position after teams but before match time */
+  flex: 1; /* Take up available space */
 }
 
+/* Match time should not stretch */
 .match-time {
   font-size: 13px;
   white-space: nowrap;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevent shrinking */
   color: #888;
   transition: color 0.2s ease;
   font-weight: 300;
   background-color: #252525;
   padding: 3px 8px;
   border-radius: 3px;
+  order: 2; /* Position after event name */
 }
 
 /* Hover effects */
@@ -153,8 +174,8 @@ html {
 }
 
 .list-group-item:hover .event-name {
-  display: block;
-  color: #ff4655; /* CS2 accent color */
+  display: inline-block; /* Show on hover */
+  color: #ff4655;
 }
 
 .list-group-item:hover .team-name {

@@ -25,19 +25,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to update UI with matches data
   const updateUI = (data) => {
+    console.log("Data received:", data);
+
     if (!data || (!data.live_matches && !data.upcoming_matches)) {
       matchList.innerHTML = "<p>Error loading matches data.</p>";
       return;
     }
 
-    // Combine live and upcoming matches
-    const allMatches = [
-      ...(data.live_matches || []),
-      ...(data.upcoming_matches || [])
-    ];
+    // Get live and upcoming matches
+    const liveMatches = data.live_matches || [];
+    const upcomingMatches = data.upcoming_matches || [];
+
+    console.log("Live matches:", liveMatches.length);
+    console.log("Upcoming matches:", upcomingMatches.length);
+
+    // Create a unique identifier function in case match_id is not available
+    const getMatchIdentifier = (match) => {
+      // If there's a match_id, use it
+      if (match.match_id) return match.match_id;
+
+      // Otherwise create an identifier using team names
+      return `${match.home_team_name || ""}-${match.away_team_name || ""}-${match.start_time || ""}`;
+    };
+
+    // Process live matches first
+    const displayMatches = [];
+    const processedIds = new Set();
+
+    // Add all live matches first
+    liveMatches.forEach(match => {
+      const id = getMatchIdentifier(match);
+      match._status = "live"; // Ensure status is marked as live
+      displayMatches.push(match);
+      processedIds.add(id);
+      console.log("Added live match:", id);
+    });
+
+    // Add upcoming matches, skipping any that match a live match ID
+    upcomingMatches.forEach(match => {
+      const id = getMatchIdentifier(match);
+      if (!processedIds.has(id)) {
+        displayMatches.push(match);
+        processedIds.add(id);
+      } else {
+        console.log("Skipped duplicate match:", id);
+      }
+    });
+
+    // Ensure live matches are at the top and upcoming are sorted by time
+    displayMatches.sort((a, b) => {
+      // Live matches always come first
+      if ((a._status === "live" || a.status === "live") &&
+        !(b._status === "live" || b.status === "live")) return -1;
+      if (!(a._status === "live" || a.status === "live") &&
+        (b._status === "live" || b.status === "live")) return 1;
+
+      // If both are upcoming, sort by start time
+      return new Date(a.start_time || 0) - new Date(b.start_time || 0);
+    });
+
+    console.log("Display matches after processing:", displayMatches.length);
+
+    // Log the first few matches to verify order
+    displayMatches.slice(0, 5).forEach((m, i) => {
+      console.log(`Match ${i}: ${m._status || m.status} - ${m.home_team_name} vs ${m.away_team_name}`);
+    });
 
     // Limit to 20 matches
-    const limitedMatches = allMatches.slice(0, 20);
+    const limitedMatches = displayMatches.slice(0, 20);
 
     if (limitedMatches.length === 0) {
       matchList.innerHTML = "<p>No matches available.</p>";
@@ -58,28 +113,51 @@ document.addEventListener("DOMContentLoaded", () => {
         const leagueName = match.league_name || "Unknown League";
         const tournamentName = match.tournament_name || "";
 
-        const matchTime = match.status === "live"
-          ? "Live"
-          : formatDateTime(match.start_time);
+        const formatEventName = (match) => {
+          const league = match.league_name || "Unknown League";
+          const season = match.season_name || "";
+
+          // If we have both league and season, format as "ESEA Advanced Season 52 North America"
+          if (league && season) {
+            // Convert "Advance North America season 52 2025" to "Advanced Season 52 North America"
+            const formattedSeason = season
+              .replace(/advance/i, "Advanced")
+              .replace(/season/i, "Season");
+
+            return `${league} ${formattedSeason}`;
+          }
+
+          // Fallback if any information is missing
+          return league;
+        };
+
+        // Determine if match is live based on status or our added _status property
+        const isLive = match._status === "live" || match.status === "live";
+        const matchTime = isLive ? "Live" : formatDateTime(match.start_time);
+
+        // Add a CSS class for live matches to style them differently
+        const matchClass = isLive
+          ? "list-group-item list-group-item-dark live-match"
+          : "list-group-item list-group-item-dark";
 
         return `
-          <a href="${HLTV_URL}" target="_blank" class="list-group-item list-group-item-dark">
-            <div class="d-flex w-100 justify-content-between">
-              <div>
-                <div class="event-name">${leagueName} - ${tournamentName}</div>
-                <div class="team">
-                  <img src="${homeTeamLogo}" alt="${match.home_team_name}" class="team-logo">
-                  <span class="team-name">${match.home_team_name}</span>
-                </div>
-                <div class="team">
-                  <img src="${awayTeamLogo}" alt="${match.away_team_name}" class="team-logo">
-                  <span class="team-name">${match.away_team_name}</span>
-                </div>
+        <a href="${HLTV_URL}" target="_blank" class="${matchClass}">
+          <div class="d-flex w-100 justify-content-between">
+            <div>
+              <div class="event-name">${formatEventName(match)}</div>
+              <div class="team">
+                <img src="${homeTeamLogo}" alt="${match.home_team_name}" class="team-logo">
+                <span class="team-name">${match.home_team_name}</span>
               </div>
-              <small class="match-time">${matchTime}</small>
+              <div class="team">
+                <img src="${awayTeamLogo}" alt="${match.away_team_name}" class="team-logo">
+                <span class="team-name">${match.away_team_name}</span>
+              </div>
             </div>
-          </a>
-        `;
+            <small class="match-time">${matchTime}</small>
+          </div>
+        </a>
+      `;
       })
       .join("");
 
@@ -103,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Retrieve data from Chrome's storage
   chrome.storage.local.get("matchesData", (result) => {
+    console.log("Retrieved from storage:", result);
     updateUI(result.matchesData);
   });
 });
