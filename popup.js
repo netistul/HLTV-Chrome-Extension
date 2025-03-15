@@ -1,116 +1,108 @@
+// popup.js
 document.addEventListener("DOMContentLoaded", () => {
   const matchList = document.getElementById("match-list");
+  const PLACEHOLDER_IMAGE = "images/placeholder.svg"; // Local path to your SVG
+  const HLTV_URL = "https://www.hltv.org/matches"; // Main HLTV matches page
 
-  // Attempt to load cached HTML content first
-  const cachedHTML = localStorage.getItem("cachedMatchListHTML");
-  if (cachedHTML) {
-    matchList.innerHTML = cachedHTML;
-    // Re-initialize any JavaScript-based UI enhancements here, if necessary
-    new SimpleBar(matchList, { autoHide: false });
+  // Function to format date and time
+  const formatDateTime = (dateTimeString) => {
+    const matchDate = new Date(dateTimeString);
+    return matchDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  // Function to handle image errors
+  function setupImageErrorHandlers() {
+    const teamLogos = document.querySelectorAll('.team-logo');
+    teamLogos.forEach(img => {
+      img.addEventListener('error', function () {
+        this.src = PLACEHOLDER_IMAGE;
+      });
+    });
   }
 
-  // Function to filter matches
-  const filterMatches = (data, now) => {
-    return data.filter((match) => {
-      if (match.date === "Date not specified") {
-        const recordDate = new Date(match.recordDate);
-        const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
+  // Function to update UI with matches data
+  const updateUI = (data) => {
+    if (!data || (!data.live_matches && !data.upcoming_matches)) {
+      matchList.innerHTML = "<p>Error loading matches data.</p>";
+      return;
+    }
 
-        // If the match has been recorded within the last 3 hours, it's considered live.
-        return hoursDiff <= 3;
-      } else {
-        const matchDate = new Date(match.date);
+    // Combine live and upcoming matches
+    const allMatches = [
+      ...(data.live_matches || []),
+      ...(data.upcoming_matches || [])
+    ];
 
-        // Allow a 1-hour delay for matches that have started
-        const oneHourInMs = 3600000;
+    // Limit to 20 matches
+    const limitedMatches = allMatches.slice(0, 20);
 
-        // Match should appear if it's within the next 24 hours or started in the last hour
-        return now <= (matchDate.getTime() + oneHourInMs) && matchDate - now <= 86400000;
-      }
-    });
-  };
+    if (limitedMatches.length === 0) {
+      matchList.innerHTML = "<p>No matches available.</p>";
+      return;
+    }
 
-  // Function to update data
-  const updateData = () => {
-    // Retrieve data from Chrome's storage
-    chrome.storage.local.get("matchesData", (result) => {
-      const data = result.matchesData;
+    matchList.innerHTML = limitedMatches
+      .map((match) => {
+        // Use placeholder image if hash is missing or empty
+        const homeTeamLogo = match.home_team_hash_image
+          ? `https://images.sportdevs.com/${match.home_team_hash_image}.png`
+          : PLACEHOLDER_IMAGE;
 
-      if (!data) {
-        matchList.innerHTML = "<p>Error loading matches data.</p>";
-        return;
-      }
+        const awayTeamLogo = match.away_team_hash_image
+          ? `https://images.sportdevs.com/${match.away_team_hash_image}.png`
+          : PLACEHOLDER_IMAGE;
 
-      // Limiting the matches to the first 20 entries
-      const limitedData = data.slice(0, 20);
-      const now = new Date(); // Use for both date comparison and recordDate comparison
+        const leagueName = match.league_name || "Unknown League";
+        const tournamentName = match.tournament_name || "";
 
-      const filteredMatches = filterMatches(limitedData, now);
+        const matchTime = match.status === "live"
+          ? "Live"
+          : formatDateTime(match.start_time);
 
-      if (filteredMatches.length === 0) {
-        matchList.innerHTML =
-          "<p>No matches today or upcoming live matches within the last hour.</p>";
-        return;
-      }
-
-      matchList.innerHTML = filteredMatches
-        .map((match) => {
-          const team1Logo =
-            match.team1Logo && match.team1Logo !== "Logo not available"
-              ? match.team1Logo
-              : "https://www.hltv.org/img/static/team/placeholder.svg";
-          const team2Logo =
-            match.team2Logo && match.team2Logo !== "Logo not available"
-              ? match.team2Logo
-              : "https://www.hltv.org/img/static/team/placeholder.svg";
-          const eventName = match.event ? match.event : "Unknown Event";
-          const localTime =
-            match.date === "Date not specified"
-              ? "Live"
-              : new Date(match.date).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-          const matchLink = match.matchLink ? match.matchLink : "#";
-
-          return `
-            <a href="${matchLink}" target="_blank" class="list-group-item list-group-item-dark">
-              <div class="d-flex w-100 justify-content-between">
-                <div>
-                  <div class="event-name">${eventName}</div>
-                  <div class="team">
-                    <img src="${team1Logo}" alt="${match.team1}" class="team-logo">
-                    <span class="team-name">${match.team1}</span>
-                  </div>
-                  <div class="team">
-                    <img src="${team2Logo}" alt="${match.team2}" class="team-logo">
-                    <span class="team-name">${match.team2}</span>
-                  </div>
+        return `
+          <a href="${HLTV_URL}" target="_blank" class="list-group-item list-group-item-dark">
+            <div class="d-flex w-100 justify-content-between">
+              <div>
+                <div class="event-name">${leagueName} - ${tournamentName}</div>
+                <div class="team">
+                  <img src="${homeTeamLogo}" alt="${match.home_team_name}" class="team-logo">
+                  <span class="team-name">${match.home_team_name}</span>
                 </div>
-                <small class="match-time">${localTime}</small>
+                <div class="team">
+                  <img src="${awayTeamLogo}" alt="${match.away_team_name}" class="team-logo">
+                  <span class="team-name">${match.away_team_name}</span>
+                </div>
               </div>
-            </a>
-          `;
-        })
-        .join("");
+              <small class="match-time">${matchTime}</small>
+            </div>
+          </a>
+        `;
+      })
+      .join("");
 
-      // Cache the generated HTML in local storage
-      localStorage.setItem("cachedMatchListHTML", matchList.innerHTML);
+    // Add error handlers to images after they're in the DOM
+    setupImageErrorHandlers();
 
-      // Get the scrollHeight of the element after populating it
-      const contentHeight = matchList.scrollHeight;
+    // Get the scrollHeight of the element after populating it
+    const contentHeight = matchList.scrollHeight;
 
-      // Set max-height to the scrollHeight or a fixed maximum value (e.g., 500px)
-      const maxHeight = Math.min(contentHeight, 500);
+    // Set max-height to the scrollHeight or a fixed maximum value (e.g., 500px)
+    const maxHeight = Math.min(contentHeight, 500);
 
-      // Dynamically set the max-height
-      matchList.style.maxHeight = `${maxHeight}px`;
+    // Dynamically set the max-height
+    matchList.style.maxHeight = `${maxHeight}px`;
 
-      // Re-initialize SimpleBar (retain the height setting)
+    // Re-initialize SimpleBar if you're still using it
+    if (typeof SimpleBar !== 'undefined') {
       new SimpleBar(matchList, { autoHide: false });
-    });
+    }
   };
 
-  // Initial update
-  updateData();
+  // Retrieve data from Chrome's storage
+  chrome.storage.local.get("matchesData", (result) => {
+    updateUI(result.matchesData);
+  });
 });

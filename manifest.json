@@ -4,9 +4,7 @@
   "version": "1.13",
   "description": "Displays matches of the day from HLTV",
   "permissions": ["storage", "alarms"],
-  "host_permissions": [
-    "https://example.blob.core.windows.net/hltv/matches.json"
-  ],
+  "host_permissions": ["https://teemo.uk/"],
   "background": {
     "service_worker": "background.js"
   },

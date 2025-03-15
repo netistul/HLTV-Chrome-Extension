@@ -1,9 +1,8 @@
+// background.js
 function fetchDataAndStore() {
   console.log("Attempting to fetch data...");
 
-  fetch(
-    `https://example.blob.core.windows.net/hltv/matches.json?timestamp=${new Date().getTime()}`
-  )
+  fetch(`https://teemo.uk/cs2?timestamp=${new Date().getTime()}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -16,15 +15,7 @@ function fetchDataAndStore() {
         console.log("Data fetched and stored.");
 
         // Calculate live matches count
-        const liveMatchesCount = data.filter((match) => {
-          if (match.date === "Date not specified") {
-            const now = new Date();
-            const recordDate = new Date(match.recordDate);
-            const hoursDiff = (now - recordDate) / 3600000; // Convert milliseconds to hours
-            return hoursDiff <= 3; // Include if recordDate is less than or equal to 3 hours old
-          }
-          return false;
-        }).length;
+        const liveMatchesCount = data.live_matches ? data.live_matches.length : 0;
 
         // Update the badge
         if (liveMatchesCount > 0) {
