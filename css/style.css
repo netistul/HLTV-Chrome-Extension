@@ -194,6 +194,30 @@ html {
   font-size: 12px;
 }
 
+/* Live match specific styling */
+.live-match .match-time {
+  color: #ffffff;
+  background-color: #00913d; /* Darker green that fits with dark theme */
+  font-weight: 500;
+}
+
+/* Always show event name for live matches */
+.live-match .event-name {
+  display: inline-block; /* Always visible for live matches */
+  color: #aaaaaa;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+/* Hover effect for live matches */
+.live-match:hover .event-name {
+  color: #00b348; /* Slightly brighter green on hover but still dark-theme friendly */
+}
+
+.live-match:hover .match-time {
+  background-color: #00b348; /* Slightly brighter green on hover */
+}
+
 /* Font declarations */
 @font-face {
   font-family: "Roboto Thin";

@@ -23,6 +23,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Function to determine if a match should be treated as live
+  const isMatchLive = (match) => {
+    // If API explicitly says it's live, trust that
+    if (match._status === "live" || match.status === "live") {
+      console.log(`Match ${match.home_team_name} vs ${match.away_team_name} is live by API status`);
+      return true;
+    }
+
+    // If API says it's finished, we should still display it as "live"
+    if (match.status === "finished") {
+      console.log(`Match ${match.home_team_name} vs ${match.away_team_name} is finished but marking as live`);
+      return true;
+    }
+
+    // If the scheduled start time has passed, consider it live
+    const scheduledTime = new Date(match.start_time || 0);
+    const currentTime = new Date();
+    const timeDifference = currentTime - scheduledTime; // in milliseconds
+
+    // If start time was more than 5 minutes ago and less than 3 hours ago, consider it live
+    const isLive = timeDifference > 5 * 60 * 1000 && timeDifference < 3 * 60 * 60 * 1000;
+
+    if (isLive) {
+      console.log(`Match ${match.home_team_name} vs ${match.away_team_name} marked as LIVE based on time`);
+    }
+
+    return isLive;
+  };
+
   // Function to update UI with matches data
   const updateUI = (data) => {
     console.log("Data received:", data);
@@ -61,10 +90,15 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Added live match:", id);
     });
 
-    // Add upcoming matches, skipping any that match a live match ID
+    // Add upcoming matches, marking them as live if they should be
     upcomingMatches.forEach(match => {
       const id = getMatchIdentifier(match);
       if (!processedIds.has(id)) {
+        // Check if this match should be treated as live based on start time
+        if (isMatchLive(match)) {
+          match._status = "live"; // Mark it as live
+          console.log("Marked upcoming match as live based on start time:", id);
+        }
         displayMatches.push(match);
         processedIds.add(id);
       } else {
@@ -75,10 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Ensure live matches are at the top and upcoming are sorted by time
     displayMatches.sort((a, b) => {
       // Live matches always come first
-      if ((a._status === "live" || a.status === "live") &&
-        !(b._status === "live" || b.status === "live")) return -1;
-      if (!(a._status === "live" || a.status === "live") &&
-        (b._status === "live" || b.status === "live")) return 1;
+      if (isMatchLive(a) && !isMatchLive(b)) return -1;
+      if (!isMatchLive(a) && isMatchLive(b)) return 1;
 
       // If both are upcoming, sort by start time
       return new Date(a.start_time || 0) - new Date(b.start_time || 0);
@@ -88,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Log the first few matches to verify order
     displayMatches.slice(0, 5).forEach((m, i) => {
-      console.log(`Match ${i}: ${m._status || m.status} - ${m.home_team_name} vs ${m.away_team_name}`);
+      console.log(`Match ${i}: ${isMatchLive(m) ? "LIVE" : "UPCOMING"} - ${m.home_team_name} vs ${m.away_team_name}`);
     });
 
     // Limit to 20 matches
@@ -131,8 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
           return league;
         };
 
-        // Determine if match is live based on status or our added _status property
-        const isLive = match._status === "live" || match.status === "live";
+        // Determine if match is live based on our enhanced logic
+        const isLive = isMatchLive(match);
         const matchTime = isLive ? "Live" : formatDateTime(match.start_time);
 
         // Add a CSS class for live matches to style them differently
@@ -141,23 +173,23 @@ document.addEventListener("DOMContentLoaded", () => {
           : "list-group-item list-group-item-dark";
 
         return `
-        <a href="${HLTV_URL}" target="_blank" class="${matchClass}">
-          <div class="d-flex w-100 justify-content-between">
-            <div>
-              <div class="event-name">${formatEventName(match)}</div>
-              <div class="team">
-                <img src="${homeTeamLogo}" alt="${match.home_team_name}" class="team-logo">
-                <span class="team-name">${match.home_team_name}</span>
+          <a href="${HLTV_URL}" target="_blank" class="${matchClass}">
+            <div class="d-flex w-100 justify-content-between">
+              <div>
+                <div class="event-name">${formatEventName(match)}</div>
+                <div class="team">
+                  <img src="${homeTeamLogo}" alt="${match.home_team_name}" class="team-logo">
+                  <span class="team-name">${match.home_team_name}</span>
+                </div>
+                <div class="team">
+                  <img src="${awayTeamLogo}" alt="${match.away_team_name}" class="team-logo">
+                  <span class="team-name">${match.away_team_name}</span>
+                </div>
               </div>
-              <div class="team">
-                <img src="${awayTeamLogo}" alt="${match.away_team_name}" class="team-logo">
-                <span class="team-name">${match.away_team_name}</span>
-              </div>
+              <small class="match-time">${matchTime}</small>
             </div>
-            <small class="match-time">${matchTime}</small>
-          </div>
-        </a>
-      `;
+          </a>
+          `;
       })
       .join("");
 
