@@ -28,6 +28,7 @@ function fetchDataAndStore() {
     })
     .catch((error) => {
       console.error("Error fetching data:", error);
+      // On error, don't clear previous data
     });
 }
 
@@ -43,10 +44,10 @@ self.addEventListener("activate", (event) => {
   fetchDataAndStore();
 });
 
-// Create an alarm that fires every 10 minutes
+// Create an alarm that fires every 2 minutes
 chrome.alarms.get("fetchDataAlarm", (alarm) => {
   if (!alarm) {
-    chrome.alarms.create("fetchDataAlarm", { periodInMinutes: 10 });
+    chrome.alarms.create("fetchDataAlarm", { periodInMinutes: 2 });
   }
 });
 
@@ -61,4 +62,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 // Fetch data when Chrome starts up
 chrome.runtime.onStartup.addListener(() => {
   fetchDataAndStore();
+});
+
+// Add listener for refresh requests from popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "refreshData") {
+    fetchDataAndStore();
+    sendResponse({ status: "Refreshing data..." });
+  }
+  return true;
 });

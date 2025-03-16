@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "HLTV Matches",
-  "version": "1.13",
-  "description": "Displays matches of the day from HLTV",
+  "name": "CS2 HLTV Matches",
+  "version": "1.5",
+  "description": "Displays live and upcoming professional Counter-Strike 2 matches.",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://teemo.uk/"],
   "background": {

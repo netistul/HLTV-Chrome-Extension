@@ -2,27 +2,27 @@ body,
 html {
   margin: 0;
   padding: 0;
-  width: 300px;
+  width: 330px;
   overflow: hidden;
-  background-color: #121212; /* Dark background */
-  color: #e1e1e1; /* Light text for dark mode */
-  font-family: "Stratum2", "Roboto", sans-serif; /* CS2-like font */
+  background-color: #121212;
+  color: #e1e1e1;
+  font-family: "Roboto", sans-serif;
 }
 
 /* Header styling */
 #header {
   background: linear-gradient(to bottom, #1a1a1a, #121212);
-  color: #f8f8f8;
+  color: #696868c4;
   text-align: center;
-  padding: 12px 0;
+  padding: 7px 0;
   font-size: 20px;
   font-weight: bold;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.5);
   width: 100%;
-  font-family: "Stratum2", "Arcon Regular", sans-serif;
-  text-transform: uppercase;
+  font-family: "Arcon Regular", sans-serif;
+
   letter-spacing: 1.5px;
-  border-bottom: 3px solid #ff4655; /* CS2 accent color */
+  border-bottom: 3px solid #ff4655;
   position: relative;
   z-index: 10;
   display: flex;
@@ -61,10 +61,18 @@ html {
 .simplebar-track.simplebar-vertical {
   background-color: #333333 !important;
   width: 10px !important;
+  margin-left: 5px; /* Add margin to separate from content */
+  right: 0 !important; /* Ensure it stays at the edge */
+}
+
+/* Adjust the content wrapper if using SimpleBar */
+.simplebar-content-wrapper {
+  padding-right: 5px; /* Add padding for content area */
+  overflow-x: hidden !important;
 }
 
 .simplebar-scrollbar::before {
-  background-color: #ff4655 !important; /* CS2 accent color */
+  background-color: #ff4655 !important;
   opacity: 1 !important;
   width: 6px !important;
   border-radius: 10px !important;
@@ -92,8 +100,9 @@ html {
   margin-bottom: 2px;
   padding: 10px 12px;
   transition: all 0.2s ease;
+  position: relative; /* Ensure it's relative for absolute star positioning */
+  padding-right: 30px; /* Make room for the star and scrollbar */
 }
-
 .team {
   display: flex;
   align-items: center;
@@ -109,7 +118,7 @@ html {
 .team-name {
   font-size: 14px;
   font-weight: 500;
-  font-family: "Stratum2", "Roboto Regular", sans-serif;
+  font-family: "Roboto Regular", sans-serif;
   color: #e1e1e1;
   transition: color 0.2s ease;
 }
@@ -136,18 +145,24 @@ html {
   margin-right: 10px;
 }
 
-/* Fix the event name positioning */
 .event-name {
   display: none; /* Hidden by default */
   font-size: 11px;
   color: #888;
-  margin-left: auto; /* Push to the right */
-  margin-right: 10px; /* Space before match time */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  order: 1; /* Position after teams but before match time */
-  flex: 1; /* Take up available space */
+  position: absolute; /* Position it absolutely */
+  top: 50%; /* Center vertically */
+  right: 35px; /* Position where the time is */
+  transform: translateY(-50%); /* Center vertically only */
+  z-index: 10; /* High z-index to be above everything */
+  max-width: 200px; /* Increase width limit for more space */
+  text-align: center;
+  padding: 2px 5px; /* Add some padding */
+  background-color: rgba(30, 30, 30, 0.9); /* Semi-transparent background */
+  border-radius: 3px;
+  border: 1px solid #333; /* Subtle border */
 }
 
 /* Match time should not stretch */
@@ -170,7 +185,7 @@ html {
   cursor: pointer;
   transform: translateY(-1px);
   box-shadow: 0 2px 10px rgba(255, 70, 85, 0.1);
-  border-left: 3px solid #ff4655; /* CS2 accent color */
+  border-left: 3px solid #ff4655;
 }
 
 .list-group-item:hover .event-name {
@@ -183,12 +198,12 @@ html {
 }
 
 .list-group-item:hover .match-time {
-  color: #ffffff;
-  background-color: #ff4655; /* CS2 accent color */
+  opacity: 0; /* Hide the time */
+  visibility: hidden; /* Remove from layout */
 }
 
 .versus {
-  color: #ff4655; /* CS2 accent color */
+  color: #ff4655;
   font-weight: bold;
   margin: 0 5px;
   font-size: 12px;
@@ -203,19 +218,200 @@ html {
 
 /* Always show event name for live matches */
 .live-match .event-name {
-  display: inline-block; /* Always visible for live matches */
+  position: static;
+  display: inline-block;
   color: #aaaaaa;
   font-size: 11px;
   margin-bottom: 4px;
+  max-width: none;
+  transform: none;
+  background-color: transparent;
+  padding: 0;
+  z-index: 1;
+  text-align: left;
+  right: auto;
+  border: none; /* Add this to remove the border */
+  border-radius: 0; /* Add this to remove any border radius */
 }
 
 /* Hover effect for live matches */
 .live-match:hover .event-name {
-  color: #00b348; /* Slightly brighter green on hover but still dark-theme friendly */
+  color: #00b348;
 }
 
 .live-match:hover .match-time {
-  background-color: #00b348; /* Slightly brighter green on hover */
+  background-color: #00b348;
+}
+
+.popular-team {
+  position: relative;
+  border-left: 3px solid #ff4655;
+  padding-right: 35px;
+}
+
+.popular-team::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/images/global-elite.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+.popular-team::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 0px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23222222"/><stop offset="50%" stop-color="%23333333"/><stop offset="100%" stop-color="%23222222"/></linearGradient></defs><path d="M256 40L76 120v240l180 112 180-112V120L256 40z" fill="url(%23metalGradient)" stroke="%23444444" stroke-width="6"/><path d="M256 80L116 146v190l140 86 140-86V146L256 80z" fill="%231e1e1e" stroke="%23333333" stroke-width="2"/><path d="M256 110L146 162v158l110 68 110-68V162L256 110z" fill="%23121212"/><path d="M256 150L292 226H372L307 273L328 350L256 300L184 350L205 273L140 226H220L256 150Z" fill="%23ff4655"/><path d="M256 40L76 120l180 40 180-40L256 40z" fill="rgba(255,255,255,0.05)"/><path d="M76 120v240l180 112V160L76 120z" fill="rgba(0,0,0,0.2)"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5; /* Keep it on top */
+}
+
+.popular-team .team,
+.popular-team .team-name,
+.popular-team .match-time,
+.popular-team .event-name {
+  position: relative;
+  z-index: 6;
+}
+
+.popular-team .event-name {
+  /* Override the existing styles */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 35px; /* Give extra space for the badge */
+  z-index: 10; /* Even higher z-index */
+  display: none; /* Still hidden by default */
+}
+
+.popular-team:hover .event-name {
+  display: inline-block;
+}
+
+/* Enhanced hover effect for popular teams - more CS2-like */
+.popular-team:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.live-match.popular-team .event-name {
+  position: static;
+  display: inline-block;
+  transform: none;
+  right: auto;
+  top: auto;
+  margin-bottom: 4px;
+}
+.popular-team:hover::before {
+  opacity: 0.3; /* Slightly more visible on hover */
+}
+/* Make team names for popular teams stand out in CS2 style */
+.popular-team .team-name {
+  font-weight: 600;
+  color: #b1ace0; /* Use accent color for team name */
+}
+
+/* Give popular teams a subtle transition */
+.popular-team {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* CS2-like easing */
+}
+
+/* Style for a group of consecutive popular matches */
+.popular-matches-group {
+  position: relative;
+  border-left: 3px solid #ff4655;
+  margin-bottom: 2px;
+}
+
+/* Background image spans the entire group */
+.popular-matches-group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/images/global-elite.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.2s ease; /* Add transition for smooth opacity change */
+}
+
+/* When hovering over any list item in the group, increase the background opacity */
+.popular-matches-group .list-group-item:hover ~ ::before,
+.popular-matches-group:hover::before {
+  opacity: 0.3;
+}
+
+/* The Global Elite icon appears only once for the group */
+.popular-matches-group::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 0px;
+  width: 30px;
+  height: 30px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23222222"/><stop offset="50%" stop-color="%23333333"/><stop offset="100%" stop-color="%23222222"/></linearGradient></defs><path d="M256 40L76 120v240l180 112 180-112V120L256 40z" fill="url(%23metalGradient)" stroke="%23444444" stroke-width="6"/><path d="M256 80L116 146v190l140 86 140-86V146L256 80z" fill="%231e1e1e" stroke="%23333333" stroke-width="2"/><path d="M256 110L146 162v158l110 68 110-68V162L256 110z" fill="%23121212"/><path d="M256 150L292 226H372L307 273L328 350L256 300L184 350L205 273L140 226H220L256 150Z" fill="%23ff4655"/><path d="M256 40L76 120l180 40 180-40L256 40z" fill="rgba(255,255,255,0.05)"/><path d="M76 120v240l180 112V160L76 120z" fill="rgba(0,0,0,0.2)"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  opacity: 0.8;
+}
+
+/* Ensure content is above the background */
+.popular-matches-group .list-group-item {
+  background-color: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhance hover effect for items in the group */
+.popular-matches-group .list-group-item:hover {
+  background-color: rgba(34, 34, 34, 0.804);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Date separator styling */
+.date-separator {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #181818;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.date-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: #333;
+}
+
+.date-text {
+  padding: 0 10px;
+  color: #ff4655;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  font-family: "Stratum2", "Arcon Regular", sans-serif;
 }
 
 /* Font declarations */
@@ -236,14 +432,6 @@ html {
 @font-face {
   font-family: "Arcon Regular";
   src: url("./Arcon-Regular.otf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* If you can add Stratum2 font which is used in CS2 */
-@font-face {
-  font-family: "Stratum2";
-  src: url("./Stratum2-Medium.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
