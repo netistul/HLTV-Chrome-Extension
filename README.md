@@ -1,6 +1,6 @@
 # HLTV-Chrome-Extension
 
-Chrome extension that displays the day's matches in a sleek popup.
+Chrome extension that displays the day's **Counter-Strike 2** matches in a sleek popup.
 
 ## Official Extension
 
