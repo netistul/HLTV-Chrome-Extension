@@ -271,8 +271,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateUI = async (data) => {
     console.log("Data received:", data);
 
-    if (!data || (!data.live_matches && !data.upcoming_matches)) {
-      matchList.innerHTML = "<p>Error loading matches data.</p>";
+    // Check if data is completely missing or undefined
+    if (!data) {
+      // Show error screen for no data
+      matchList.innerHTML = generateConnectionErrorHTML();
+      setupRetryButton();
       return;
     }
 
@@ -286,6 +289,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Live matches:", liveMatches.length);
     console.log("Upcoming matches:", upcomingMatches.length);
+
+    // If both arrays exist but are empty, show the "No Matches Found" screen
+    if (Array.isArray(liveMatches) && Array.isArray(upcomingMatches) &&
+      liveMatches.length === 0 && upcomingMatches.length === 0) {
+      matchList.innerHTML = generateNoMatchesHTML();
+      setupBackgroundSyncCountdown();
+      return;
+    }
 
     // Process live matches first
     const displayMatches = [];
@@ -331,11 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Limit to 50 matches
     const limitedMatches = displayMatches.slice(0, 50);
-
-    if (limitedMatches.length === 0) {
-      matchList.innerHTML = "<p>No matches available.</p>";
-      return;
-    }
 
     // Group matches by date
     const matchesByDate = {};
@@ -462,7 +468,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     handleConsecutivePopularMatches();
-
   };
 
   // Retrieve data from Chrome's storage
@@ -553,4 +558,109 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  //? Helper Functions
+  // Generate HTML for connection error
+  function generateConnectionErrorHTML() {
+    return `
+    <div class="error-container">
+      <div class="error-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4Z" stroke="#ff4655" stroke-width="2"/>
+          <path d="M12 8V12" stroke="#ff4655" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="15" r="1" fill="#ff4655"/>
+        </svg>
+      </div>
+      <h3 class="error-title">Connection Error</h3>
+      <p class="error-message">We couldn't load the matches data right now.</p>
+      <div class="error-actions">
+        <button id="retry-button" class="retry-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="retry-icon">
+            <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C15.3019 3 18.1885 4.77814 19.7545 7.42909" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <path d="M21 3V7H17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Retry
+        </button>
+      </div>
+    </div>
+  `;
+  }
+
+  // Generate HTML for no matches found
+  function generateNoMatchesHTML() {
+    return `
+    <div class="empty-container">
+      <div class="empty-icon">
+        <img src="icon.png" width="48" height="48" alt="No matches found">
+      </div>
+      <h3 class="empty-title">No Matches For Today</h3>
+      <p class="empty-message">There are no upcoming or live matches at the moment.</p>
+      <p class="empty-hint">Check back later for new matches</p>
+      <div class="next-check">
+        <span class="next-check-label">Next check:</span>
+        <span class="next-check-time">-</span>
+      </div>
+    </div>
+  `;
+  }
+
+  // Setup retry button event listener
+  function setupRetryButton() {
+    document.getElementById('retry-button').addEventListener('click', function () {
+      // Request fresh data from background script
+      chrome.runtime.sendMessage({ action: "fetchMatches" }, function (response) {
+        console.log("Retry fetch response:", response);
+      });
+    });
+  }
+
+  // Setup countdown synced with background.js alarm
+  function setupBackgroundSyncCountdown() {
+    const nextCheckElement = document.querySelector('.next-check-time');
+
+    // Get the next scheduled alarm time for fetchDataAlarm
+    chrome.alarms.get("fetchDataAlarm", (alarm) => {
+      if (!alarm) {
+        nextCheckElement.textContent = "unknown";
+        return;
+      }
+
+      // Calculate time until next alarm
+      const now = Date.now();
+      const nextAlarmTime = alarm.scheduledTime;
+      let timeRemaining = Math.max(0, nextAlarmTime - now);
+
+      updateCountdownDisplay(timeRemaining);
+
+      // Update the countdown every second
+      const countdownInterval = setInterval(() => {
+        timeRemaining = Math.max(0, timeRemaining - 1000);
+
+        if (timeRemaining <= 0) {
+          clearInterval(countdownInterval);
+          nextCheckElement.textContent = "Checking...";
+
+          // Wait a bit for the background fetch to complete, then refresh our view
+          setTimeout(() => {
+            chrome.storage.local.get("matchesData", (result) => {
+              updateUI(result.matchesData);
+            });
+          }, 2000);
+
+          return;
+        }
+
+        updateCountdownDisplay(timeRemaining);
+      }, 1000);
+    });
+  }
+
+  // Helper function to format and display the countdown
+  function updateCountdownDisplay(milliseconds) {
+    const nextCheckElement = document.querySelector('.next-check-time');
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    nextCheckElement.textContent = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
 });

@@ -414,6 +414,115 @@ html {
   font-family: "Stratum2", "Arcon Regular", sans-serif;
 }
 
+/* Error and Empty States */
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  margin: 10px;
+  min-height: 250px;
+}
+
+.error-icon,
+.empty-icon {
+  margin-bottom: 15px;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.error-title,
+.empty-title {
+  font-family: "Arcon Regular", sans-serif;
+  margin: 0 0 10px 0;
+  color: #ff4655;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.error-message,
+.empty-message {
+  margin: 0 0 15px 0;
+  color: #e1e1e1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.empty-hint {
+  color: #888;
+  font-size: 13px;
+  margin: 0 0 20px 0;
+  font-style: italic;
+}
+
+.error-actions {
+  margin-top: 15px;
+}
+
+.retry-button {
+  background-color: #ff4655;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(255, 70, 85, 0.3);
+}
+
+.retry-button:hover {
+  background-color: #ff5c6a;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(255, 70, 85, 0.5);
+}
+
+.retry-icon {
+  margin-right: 8px;
+}
+
+.next-check {
+  background-color: #252525;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.next-check-label {
+  color: #888;
+  margin-right: 5px;
+}
+
+.next-check-time {
+  color: #ff4655;
+  font-weight: 500;
+  font-family: "Roboto Regular", sans-serif;
+}
+
 /* Font declarations */
 @font-face {
   font-family: "Roboto Thin";
