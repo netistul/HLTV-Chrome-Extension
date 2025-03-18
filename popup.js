@@ -490,25 +490,44 @@ document.addEventListener("DOMContentLoaded", () => {
         processedMatches.add(popularMatches[i]);
 
         // Find consecutive matches
-        let nextIndex = i + 1;
-        while (nextIndex < popularMatches.length) {
-          const current = popularMatches[i];
-          const next = popularMatches[nextIndex];
+        let currentMatch = popularMatches[i];
 
-          // Check if they're consecutive in the DOM
-          if (next.previousElementSibling === current ||
-            (next.previousElementSibling &&
-              next.previousElementSibling.previousElementSibling === current)) {
-            group.push(next);
-            processedMatches.add(next);
-            nextIndex++;
-          } else {
-            break;
+        // Keep checking for next matches
+        for (let j = i + 1; j < popularMatches.length; j++) {
+          const nextMatch = popularMatches[j];
+
+          // Skip if already processed
+          if (processedMatches.has(nextMatch)) continue;
+
+          // Check if they're close to each other in the DOM (max 2 elements between)
+          let isConsecutive = false;
+          let elementsBetween = 0;
+          let tempElement = currentMatch;
+
+          // Check up to 3 elements ahead (allowing for 2 elements between matches)
+          for (let step = 0; step < 3; step++) {
+            if (!tempElement.nextElementSibling) break;
+            tempElement = tempElement.nextElementSibling;
+
+            if (tempElement === nextMatch) {
+              isConsecutive = true;
+              break;
+            }
+            elementsBetween++;
+          }
+
+          if (isConsecutive) {
+            // Add to group
+            group.push(nextMatch);
+            processedMatches.add(nextMatch);
+            currentMatch = nextMatch; // Update current match for next iteration
           }
         }
 
         // If we have a group of at least 2 consecutive popular matches
         if (group.length >= 2) {
+          console.log(`Created group with ${group.length} matches`); // Debug
+
           // Create a container for the group
           const container = document.createElement('div');
           container.className = 'popular-matches-group';

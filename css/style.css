@@ -321,11 +321,6 @@ html {
 .popular-team:hover::before {
   opacity: 0.3; /* Slightly more visible on hover */
 }
-/* Make team names for popular teams stand out in CS2 style */
-.popular-team .team-name {
-  font-weight: 600;
-  color: #b1ace0; /* Use accent color for team name */
-}
 
 /* Give popular teams a subtle transition */
 .popular-team {
