@@ -480,19 +480,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (group.length >= 2) {
           console.log(`Created group with ${group.length} matches`); // Debug
 
-          // Get the first match and its parent
-          const firstMatch = group[0];
-          const parentNode = firstMatch.parentNode;
-
-          // Store the next sibling before we remove anything
-          // This will be our insertion point reference
-          const nextSibling = firstMatch.nextSibling;
-
           // Create a container for the group
           const container = document.createElement('div');
           container.className = 'popular-matches-group';
 
-          // Process all matches in the group
+          // Get the first match in group
+          const firstMatch = group[0];
+
+          // Insert the container before the first match
+          firstMatch.parentNode.insertBefore(container, firstMatch);
+
+          // Move all matches in the group into the container
           group.forEach(match => {
             // Remove the individual popular styling
             match.classList.remove('popular-team');
@@ -502,14 +500,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // Move to the container
             container.appendChild(match);
           });
-
-          // Insert the container back into the correct position using the nextSibling reference
-          if (nextSibling) {
-            parentNode.insertBefore(container, nextSibling);
-          } else {
-            // If there's no next sibling, append to the end
-            parentNode.appendChild(container);
-          }
         }
       }
     }
