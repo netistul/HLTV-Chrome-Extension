@@ -36,9 +36,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // Implement lazy loading for images
+  function setupLazyLoading() {
+    // Create IntersectionObserver instance
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const dataSrc = img.getAttribute('data-src');
+
+          if (dataSrc) {
+            img.src = dataSrc;
+            img.removeAttribute('data-src');
+
+            // Handle image load errors
+            img.addEventListener('error', function () {
+              if (this.src !== PLACEHOLDER_IMAGE) {
+                console.log(`[Lazy Load] Image load error: ${this.src.split('/').pop()}`);
+                this.src = PLACEHOLDER_IMAGE;
+              }
+            });
+
+            // Stop observing once loaded
+            observer.unobserve(img);
+          }
+        }
+      });
+    }, {
+      rootMargin: "50px 0px" // Start loading when image is 50px from viewport
+    });
+
+    // Observe all lazy images
+    const lazyImages = document.querySelectorAll('img.team-logo[data-src]');
+    lazyImages.forEach(img => imageObserver.observe(img));
+  }
+
   // Function to handle image errors
   function setupImageHandlers() {
-    const teamLogos = document.querySelectorAll('.team-logo');
+    const teamLogos = document.querySelectorAll('.team-logo:not([data-src])'); // Only handle non-lazy images
     teamLogos.forEach(img => {
       // Handle load errors
       img.addEventListener('error', function () {
@@ -335,17 +370,18 @@ document.addEventListener("DOMContentLoaded", () => {
           matchClass += " popular-team";
         }
 
+        // Use data-src instead of src for lazy loading
         matchesHTML.push(`
           <a href="${HLTV_URL}" target="_blank" class="${matchClass}">
             <div class="d-flex w-100 justify-content-between">
               <div>
                 <div class="event-name">${eventName}</div>
                 <div class="team">
-                  <img src="${homeTeamLogo}" alt="${homeTeamName}" class="team-logo">
+                  <img src="${PLACEHOLDER_IMAGE}" data-src="${homeTeamLogo}" alt="${homeTeamName}" class="team-logo">
                   <span class="team-name">${homeTeamName}</span>
                 </div>
                 <div class="team">
-                  <img src="${awayTeamLogo}" alt="${awayTeamName}" class="team-logo">
+                  <img src="${PLACEHOLDER_IMAGE}" data-src="${awayTeamLogo}" alt="${awayTeamName}" class="team-logo">
                   <span class="team-name">${awayTeamName}</span>
                 </div>
               </div>
@@ -358,7 +394,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     matchList.innerHTML = matchesHTML.join("");
 
-    // Add error handlers to images after they're in the DOM
+    // Initialize lazy loading after DOM is populated
+    setupLazyLoading();
+
+    // Add error handlers to non-lazy images (if any)
     setupImageHandlers();
 
     // Get the scrollHeight of the element after populating it
