@@ -40,39 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function setupImageHandlers() {
     const teamLogos = document.querySelectorAll('.team-logo');
     teamLogos.forEach(img => {
-      // Handle successful loads
-      img.addEventListener('load', function () {
-        const logoUrl = this.src;
-        if (logoUrl.includes('teemo.uk')) {
-          const logoId = logoUrl.split('/').pop();
-          console.log(`[function setupImageHandlers] Image loaded successfully: ${logoId}`);
-
-          // Check if we already have it cached
-          const cacheKey = `logo_${logoId}`;
-          chrome.storage.local.get(cacheKey, (result) => {
-            if (!result[cacheKey]) {
-              console.log(`[function setupImageHandlers] Capturing successfully loaded image: ${logoId}`);
-              // Capture the image to the cache by creating a canvas
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              canvas.width = this.naturalWidth;
-              canvas.height = this.naturalHeight;
-              ctx.drawImage(this, 0, 0);
-
-              try {
-                const dataURL = canvas.toDataURL('image/png');
-                saveImageToCache(logoUrl, dataURL);
-              } catch (e) {
-                console.error(`❌ Error capturing image: ${e.message}`);
-              }
-            }
-          });
-        }
-      });
-
       // Handle load errors
       img.addEventListener('error', function () {
-        if (this.src !== PLACEHOLDER_IMAGE && this.src.includes('teemo.uk')) {
+        if (this.src !== PLACEHOLDER_IMAGE) {
           console.log(`[function setupImageHandlers] Image load error: ${this.src.split('/').pop()}`);
           this.src = PLACEHOLDER_IMAGE;
         }
@@ -125,75 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Helper function to get team logo from different API formats
-  const getTeamLogo = async (team) => {
+  const getTeamLogo = (team) => {
     if (!team) return PLACEHOLDER_IMAGE;
 
     // New API format with logo object from teemo.uk
     if (team.logo && team.logo.path) {
-      const logoUrl = `https://teemo.uk${team.logo.path}`;
-      const logoId = logoUrl.split('/').pop();
-      const cacheKey = `logo_${logoId}`;
-
-      // Check if logo is in cache
-      const cachedResult = await new Promise(resolve => {
-        chrome.storage.local.get(cacheKey, (result) => {
-          resolve(result[cacheKey]);
-        });
-      });
-
-      if (cachedResult) {
-        console.log(`[const getTeamLogo] Loading logo from cache: ${logoId}`);
-        return cachedResult;
-      }
-
-      console.log(`🌐 Logo not in cache, will attempt to fetch and cache: ${logoId}`);
-      // Return the URL for now, but start the cache process in the background
-      fetchAndCacheLogo(logoUrl);
-      return logoUrl;
+      return `https://teemo.uk${team.logo.path}`;
     }
 
     return PLACEHOLDER_IMAGE;
   };
-
-  function fetchAndCacheLogo(logoUrl) {
-    const logoId = logoUrl.split('/').pop();
-    console.log(`[function fetchAndCacheLogo] Attempting to fetch logo: ${logoId}`);
-
-    fetch(logoUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Network response not ok: ${response.status}`);
-        }
-        return response.blob();
-      })
-      .then(blob => {
-        // Convert blob to base64
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          // Save the base64 data to cache
-          saveImageToCache(logoUrl, reader.result);
-        };
-        reader.readAsDataURL(blob);
-      })
-      .catch(error => {
-        console.log(`❌ Failed to fetch logo: ${logoId}`, error.message);
-      });
-  }
-
-  function saveImageToCache(logoUrl, base64Data) {
-    const logoId = logoUrl.split('/').pop(); // Extract logo ID from URL
-    const cacheKey = `logo_${logoId}`;
-
-    console.log(`📦 Attempting to cache: ${logoId}`);
-
-    chrome.storage.local.set({ [cacheKey]: base64Data }, () => {
-      if (chrome.runtime.lastError) {
-        console.error(`❌ Error saving to cache: ${chrome.runtime.lastError.message}`);
-      } else {
-        console.log(`[function saveImageToCache] Successfully saved to cache: ${logoId}`);
-      }
-    });
-  }
 
   // Function to get match identifier from different API formats
   const getMatchIdentifier = (match) => {
@@ -268,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to update UI with matches data
-  const updateUI = async (data) => {
+  const updateUI = (data) => {
     console.log("Data received:", data);
 
     // Check if data is completely missing or undefined
@@ -381,14 +292,14 @@ document.addEventListener("DOMContentLoaded", () => {
       `);
 
       // Add matches for this date
-      const dateMatchPromises = matches.map(async (match) => {
+      matches.forEach(match => {
         // Get team names
         const homeTeamName = match.homeTeam ? getTeamName(match.homeTeam) : match.home_team_name || "Unknown";
         const awayTeamName = match.awayTeam ? getTeamName(match.awayTeam) : match.away_team_name || "Unknown";
 
-        // Get team logos with caching
-        const homeTeamLogo = match.homeTeam ? await getTeamLogo(match.homeTeam) : PLACEHOLDER_IMAGE;
-        const awayTeamLogo = match.awayTeam ? await getTeamLogo(match.awayTeam) : PLACEHOLDER_IMAGE;
+        // Get team logos directly
+        const homeTeamLogo = match.homeTeam ? getTeamLogo(match.homeTeam) : PLACEHOLDER_IMAGE;
+        const awayTeamLogo = match.awayTeam ? getTeamLogo(match.awayTeam) : PLACEHOLDER_IMAGE;
 
         // Get event name
         const eventName = formatEventName(match);
@@ -424,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
           matchClass += " popular-team";
         }
 
-        return `
+        matchesHTML.push(`
           <a href="${HLTV_URL}" target="_blank" class="${matchClass}">
             <div class="d-flex w-100 justify-content-between">
               <div>
@@ -441,11 +352,8 @@ document.addEventListener("DOMContentLoaded", () => {
               <small class="match-time">${matchTime}</small>
             </div>
           </a>
-        `;
+        `);
       });
-
-      const dateMatchesHTML = await Promise.all(dateMatchPromises);
-      matchesHTML = matchesHTML.concat(dateMatchesHTML);
     }
 
     matchList.innerHTML = matchesHTML.join("");
