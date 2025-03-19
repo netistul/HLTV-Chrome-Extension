@@ -480,6 +480,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (group.length >= 2) {
           console.log(`Created group with ${group.length} matches`); // Debug
 
+          // Create a DocumentFragment to hold our changes
+          const fragment = document.createDocumentFragment();
+
           // Create a container for the group
           const container = document.createElement('div');
           container.className = 'popular-matches-group';
@@ -487,10 +490,11 @@ document.addEventListener("DOMContentLoaded", () => {
           // Get the first match in group
           const firstMatch = group[0];
 
-          // Insert the container before the first match
-          firstMatch.parentNode.insertBefore(container, firstMatch);
+          // Get the insertion point (before the first match)
+          const insertionPoint = firstMatch.parentNode;
+          const insertBeforeElement = firstMatch;
 
-          // Move all matches in the group into the container
+          // Process all matches in the group
           group.forEach(match => {
             // Remove the individual popular styling
             match.classList.remove('popular-team');
@@ -500,6 +504,12 @@ document.addEventListener("DOMContentLoaded", () => {
             // Move to the container
             container.appendChild(match);
           });
+
+          // Add the container to the fragment
+          fragment.appendChild(container);
+
+          // Insert the fragment into the DOM at the right position
+          insertionPoint.insertBefore(container, insertBeforeElement);
         }
       }
     }
