@@ -194,12 +194,14 @@ html {
 }
 
 .list-group-item:hover .team-name {
-  color: #ffffff;
+  color: #e6e5e5;
 }
 
-.list-group-item:hover .match-time {
-  opacity: 0; /* Hide the time */
-  visibility: hidden; /* Remove from layout */
+/* Keep live match time visible on hover */
+.list-group-item:hover .live-match .match-time,
+.live-match:hover .match-time {
+  opacity: 1;
+  visibility: visible;
 }
 
 .versus {
@@ -237,8 +239,8 @@ html {
 
 /* Hover effect for live matches */
 .live-match:hover .event-name {
-  font-size: 16px;
-  color: #fdfdfd;
+  font-size: 12px;
+  color: #eae7e7;
   font-weight: bold;
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
   font-family: "Arcon Regular", sans-serif;

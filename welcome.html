@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CS2 HLTV Matches Installed</title>
+    <style>
+      body {
+        font-family: "Roboto", Helvetica, Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        font-weight: 400;
+        color: rgb(6, 6, 7);
+      }
+      h1 {
+        text-align: center;
+        color: rgb(26, 26, 26);
+        margin-bottom: 30px;
+        margin-top: 90px;
+        font-size: 45px;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeSlideIn 0.6s forwards;
+      }
+      .step {
+        margin-bottom: 40px;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .step:nth-of-type(1) {
+        animation: fadeSlideIn 0.6s forwards 0.2s;
+      }
+      .step:nth-of-type(2) {
+        animation: fadeSlideIn 0.6s forwards 0.4s;
+      }
+      .step-title {
+        font-size: 23px;
+        text-align: center;
+        margin-bottom: 0px;
+        padding-left: 20px;
+      }
+      .image-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 1px 0;
+      }
+      .responsive-image {
+        max-width: 100%;
+        height: auto;
+      }
+      footer {
+        text-align: center;
+        margin-top: 50px;
+        color: #777;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeSlideIn 0.6s forwards 0.6s;
+      }
+      @keyframes fadeSlideIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CS2 Matches Installed</h1>
+
+    <div class="step">
+      <p class="step-title">
+        Click the puzzle piece (1) in the top right of your browser. Then, click
+        the little pin (2) next to the extension:
+      </p>
+      <div class="image-wrapper">
+        <img
+          class="responsive-image"
+          alt="Pin extension step"
+          src="images/pin.png"
+        />
+      </div>
+    </div>
+
+    <div class="step">
+      <p class="step-title">Open the extension (3)</p>
+      <div class="image-wrapper">
+        <img
+          class="responsive-image"
+          alt="Using extension step"
+          src="images/open.png"
+        />
+      </div>
+    </div>
+
+    <footer>
+      <p>Stay updated with Counter-Strike matches every day!</p>
+    </footer>
+  </body>
+</html>

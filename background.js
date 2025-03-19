@@ -72,3 +72,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return true;
 });
+
+// Open welcome page when extension is first installed
+chrome.runtime.onInstalled.addListener(function (details) {
+  if (details.reason === "install") {
+    // Open welcome page when extension is first installed
+    chrome.tabs.create({
+      url: "welcome.html"
+    });
+  }
+});
