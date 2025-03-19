@@ -480,19 +480,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (group.length >= 2) {
           console.log(`Created group with ${group.length} matches`); // Debug
 
-          // Create a DocumentFragment to hold our changes
-          const fragment = document.createDocumentFragment();
+          // Get the first match and its parent
+          const firstMatch = group[0];
+          const parentNode = firstMatch.parentNode;
+
+          // Store the next sibling before we remove anything
+          // This will be our insertion point reference
+          const nextSibling = firstMatch.nextSibling;
 
           // Create a container for the group
           const container = document.createElement('div');
           container.className = 'popular-matches-group';
-
-          // Get the first match in group
-          const firstMatch = group[0];
-
-          // Get the insertion point (before the first match)
-          const insertionPoint = firstMatch.parentNode;
-          const insertBeforeElement = firstMatch;
 
           // Process all matches in the group
           group.forEach(match => {
@@ -505,11 +503,13 @@ document.addEventListener("DOMContentLoaded", () => {
             container.appendChild(match);
           });
 
-          // Add the container to the fragment
-          fragment.appendChild(container);
-
-          // Insert the fragment into the DOM at the right position
-          insertionPoint.insertBefore(container, insertBeforeElement);
+          // Insert the container back into the correct position using the nextSibling reference
+          if (nextSibling) {
+            parentNode.insertBefore(container, nextSibling);
+          } else {
+            // If there's no next sibling, append to the end
+            parentNode.appendChild(container);
+          }
         }
       }
     }
