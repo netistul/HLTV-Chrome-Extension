@@ -427,82 +427,94 @@ document.addEventListener("DOMContentLoaded", () => {
     // Get all popular team matches
     const popularMatches = document.querySelectorAll('.popular-team');
 
-    // If we have at least 2 popular matches
     if (popularMatches.length >= 2) {
-      // Track which matches we've processed
-      const processedMatches = new Set();
+      // Process matches in their natural DOM order
+      let currentGroup = [];
+      let lastMatch = null;
 
-      // For each popular match
-      for (let i = 0; i < popularMatches.length; i++) {
-        // Skip if already processed
-        if (processedMatches.has(popularMatches[i])) continue;
-
-        // Start a new group
-        const group = [popularMatches[i]];
-        processedMatches.add(popularMatches[i]);
-
-        // Find consecutive matches
-        let currentMatch = popularMatches[i];
-
-        // Keep checking for next matches
-        for (let j = i + 1; j < popularMatches.length; j++) {
-          const nextMatch = popularMatches[j];
-
-          // Skip if already processed
-          if (processedMatches.has(nextMatch)) continue;
-
-          // Check if they're close to each other in the DOM (max 2 elements between)
-          let isConsecutive = false;
-          let elementsBetween = 0;
-          let tempElement = currentMatch;
-
-          // Check up to 3 elements ahead (allowing for 2 elements between matches)
-          for (let step = 0; step < 3; step++) {
-            if (!tempElement.nextElementSibling) break;
-            tempElement = tempElement.nextElementSibling;
-
-            if (tempElement === nextMatch) {
-              isConsecutive = true;
-              break;
-            }
-            elementsBetween++;
+      // Iterate through all popular matches in their natural DOM order
+      popularMatches.forEach(match => {
+        // If this is the first match or it's consecutive with the last match
+        // AND they're in the same date group
+        if (!lastMatch || (isConsecutiveMatch(lastMatch, match) && isSameDateGroup(lastMatch, match))) {
+          // Add to current group
+          currentGroup.push(match);
+        } else {
+          // Not consecutive or in different date groups, process the previous group if it has 2+ matches
+          if (currentGroup.length >= 2) {
+            processMatchGroup(currentGroup);
           }
-
-          if (isConsecutive) {
-            // Add to group
-            group.push(nextMatch);
-            processedMatches.add(nextMatch);
-            currentMatch = nextMatch; // Update current match for next iteration
-          }
+          // Start a new group with this match
+          currentGroup = [match];
         }
 
-        // If we have a group of at least 2 consecutive popular matches
-        if (group.length >= 2) {
-          console.log(`Created group with ${group.length} matches`); // Debug
+        // Update lastMatch for next iteration
+        lastMatch = match;
+      });
 
-          // Create a container for the group
-          const container = document.createElement('div');
-          container.className = 'popular-matches-group';
-
-          // Get the first match in group
-          const firstMatch = group[0];
-
-          // Insert the container before the first match
-          firstMatch.parentNode.insertBefore(container, firstMatch);
-
-          // Move all matches in the group into the container
-          group.forEach(match => {
-            // Remove the individual popular styling
-            match.classList.remove('popular-team');
-            match.style.border = 'none';
-            match.style.borderBottom = '1px solid #333';
-
-            // Move to the container
-            container.appendChild(match);
-          });
-        }
+      // Process the final group if it exists and has 2+ matches
+      if (currentGroup.length >= 2) {
+        processMatchGroup(currentGroup);
       }
     }
+  }
+
+  // Helper function to check if two matches are consecutive in the DOM
+  function isConsecutiveMatch(match1, match2) {
+    let nextElement = match1.nextElementSibling;
+
+    // Skip date separators
+    while (nextElement && nextElement.classList.contains('date-separator')) {
+      nextElement = nextElement.nextElementSibling;
+    }
+
+    // Check if the next element is the second match
+    return nextElement === match2;
+  }
+
+  // Helper function to check if two matches belong to the same date group
+  function isSameDateGroup(match1, match2) {
+    // Find the previous date separator for each match
+    const getDateSeparator = (match) => {
+      let element = match.previousElementSibling;
+      while (element) {
+        if (element.classList.contains('date-separator')) {
+          return element;
+        }
+        element = element.previousElementSibling;
+      }
+      return null;
+    };
+
+    const separator1 = getDateSeparator(match1);
+    const separator2 = getDateSeparator(match2);
+
+    // If they have the same date separator, they're in the same date group
+    return separator1 === separator2;
+  }
+
+  // Helper function to process a group of consecutive matches
+  function processMatchGroup(matchGroup) {
+    console.log(`Found group with ${matchGroup.length} consecutive matches`);
+
+    // Create a container for the group
+    const container = document.createElement('div');
+    container.className = 'popular-matches-group';
+
+    // Insert the container before the first match in the group
+    const firstMatch = matchGroup[0];
+    firstMatch.parentNode.insertBefore(container, firstMatch);
+
+    // Move all matches in the group to the container in their original order
+    matchGroup.forEach(match => {
+      // Remove the individual popular styling
+      match.classList.remove('popular-team');
+      match.style.border = 'none';
+      match.style.borderBottom = '1px solid #333';
+
+      // Move to the container (preserving order)
+      container.appendChild(match);
+    });
   }
 
   //? Helper Functions
