@@ -87,22 +87,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to determine if a match should be treated as live
   const isMatchLive = (match) => {
-    // If the match comes from live_matches array, it's live
+    // First priority: If the match comes from live_matches array, it's live
     if (match._status === "live") {
       return true;
     }
 
-    // If API explicitly says it's in progress
-    if (match.status && match.status.type === "inprogress") {
-      return true;
+    // Second priority: Check explicit status from API
+    if (match.status) {
+      // If it's an object with type property (new API format)
+      if (typeof match.status === 'object' && match.status.type) {
+        return match.status.type === "inprogress" ||
+          match.status.type === "live" ||
+          match.status.description === "In Progress";
+      }
+
+      // If it's a string (old API format)
+      if (typeof match.status === 'string') {
+        return match.status === "live" || match.status === "finished";
+      }
     }
 
-    // For backward compatibility with older format
-    if (match.status === "live" || match.status === "finished") {
-      return true;
-    }
-
-    // If the scheduled start time has passed, consider it live
+    // Last resort: Use time-based detection only if status is unavailable
+    // This should be a fallback only when API doesn't provide status
     let startTime;
     if (match.startTimestamp) {
       startTime = new Date(match.startTimestamp * 1000);
@@ -118,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeDifference = currentTime - startTime; // in milliseconds
 
     // If start time was more than 5 minutes ago and less than 3 hours ago, consider it live
+    // But only use this as a fallback when status is not available
     const isLive = timeDifference > 5 * 60 * 1000 && timeDifference < 3 * 60 * 60 * 1000;
 
     return isLive;
