@@ -364,7 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Check if either team has high userCount (> 1000)
         const homeTeamUserCount = match.homeTeam && match.homeTeam.userCount ? match.homeTeam.userCount : 0;
         const awayTeamUserCount = match.awayTeam && match.awayTeam.userCount ? match.awayTeam.userCount : 0;
-        const isPopularMatch = homeTeamUserCount > 500 || awayTeamUserCount > 500;
+        const isPopularMatch = homeTeamUserCount > 600 || awayTeamUserCount > 600;
 
         // Build CSS classes
         let matchClass = "list-group-item list-group-item-dark";

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CS2 HLTV Matches",
-  "version": "1.79",
+  "version": "1.80",
   "description": "Displays live and upcoming professional Counter-Strike 2 matches.",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://teemo.uk/"],
