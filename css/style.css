@@ -265,7 +265,7 @@ html {
   background-image: url("/images/global-elite.png");
   background-size: cover;
   background-position: center;
-  opacity: 0.1;
+  opacity: 0.05;
   pointer-events: none;
   z-index: 0;
 }
@@ -320,7 +320,7 @@ html {
   margin-bottom: 4px;
 }
 .popular-team:hover::before {
-  opacity: 0.3; /* Slightly more visible on hover */
+  opacity: 0.15; /* Slightly more visible on hover */
 }
 
 /* Give popular teams a subtle transition */
@@ -345,7 +345,7 @@ html {
   background-image: url("/images/global-elite.png");
   background-size: cover;
   background-position: center;
-  opacity: 0.15;
+  opacity: 0.03;
   pointer-events: none;
   z-index: 0;
   transition: opacity 0.2s ease; /* Add transition for smooth opacity change */
@@ -354,7 +354,7 @@ html {
 /* When hovering over any list item in the group, increase the background opacity */
 .popular-matches-group .list-group-item:hover ~ ::before,
 .popular-matches-group:hover::before {
-  opacity: 0.3;
+  opacity: 0.15;
 }
 
 /* The Global Elite icon appears only once for the group */

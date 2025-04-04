@@ -442,12 +442,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Iterate through all popular matches in their natural DOM order
       popularMatches.forEach(match => {
         // If this is the first match or it's consecutive with the last match
-        // AND they're in the same date group
-        if (!lastMatch || (isConsecutiveMatch(lastMatch, match) && isSameDateGroup(lastMatch, match))) {
+        // AND they're in the same date group AND the current group has less than 3 matches
+        if (!lastMatch ||
+          (isConsecutiveMatch(lastMatch, match) &&
+            isSameDateGroup(lastMatch, match) &&
+            currentGroup.length < 3)) {
           // Add to current group
           currentGroup.push(match);
         } else {
-          // Not consecutive or in different date groups, process the previous group if it has 2+ matches
+          // Not consecutive or in different date groups or reached 3 matches,
+          // process the previous group if it has 2+ matches
           if (currentGroup.length >= 2) {
             processMatchGroup(currentGroup);
           }
